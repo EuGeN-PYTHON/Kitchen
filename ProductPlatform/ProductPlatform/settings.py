@@ -138,5 +138,5 @@ EMAIL_USE_SSL = False
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = 'tmp/emails'
 
-TIME_START_CHECK_ORDER_STATUS = ["00:00", "03:00"]  # запуск скрипта, время по москве
+TIME_START_CHECK_ORDER_STATUS = ["12:05", "03:00"]  # запуск скрипта, время по москве
 

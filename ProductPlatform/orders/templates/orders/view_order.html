@@ -64,10 +64,10 @@
                                         </div>
 
 
-                                        {% if user.role != 'Supplier' and order.status == 'Active' and not approved_response and not cancelled_response_response %}
+                                        {% if user.role != 'Supplier' and order.status == 'Active' and not approved_response and not cancelled_response_response and response_order.last_status == "On Approval" %}
                                             <i data-bs-toggle="modal"
-                                               data-bs-target="#staticBackdrop2_{{ response_order.response_user.id }}"
-                                               class="fa fa-close accept"></i>
+                                               data-bs-target="#staticBackdrop1_{{ response_order.response_user.id }}"
+                                               class="fa fa-check accept"></i>
                                             <i data-bs-toggle="modal"
                                                data-bs-target="#staticBackdrop2_{{ response_order.response_user.id }}"
                                                class="fa fa-close cancel"></i>
@@ -157,9 +157,12 @@
 
                                         {% if approved_response and approved_response == response_order %}
                                             <span class="accepted-response">Принят</span>
-                                        {% elif approved_response and approved_response != response_order %}
-                                            <span class="not-accepted-response"></span>
+                                        {% elif response_order.last_status == "Not Approved" %}
+                                            <span class="not-accepted-response">Отклонен</span>
+{#                                        {% elif approved_response and approved_response != response_order %}#}
+{#                                            <span class="not-accepted-response">Отклонен</span>#}
                                         {% endif %}
+
                                     </div>
                                 </li>
                             {% endfor %}

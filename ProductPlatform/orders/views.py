@@ -221,11 +221,15 @@ class OrderView(LoginRequiredMixin, MultiModelFormView):
         responses = []
         not_active_responses_order_users_id = []
 
+
         if request.user.role == 'Customer':
             for response_order in response_orders:
                 response_statuses = StatusResponse.objects.filter(
                     response_order=response_order).last()
+                response_order.last_status = response_statuses.status
                 if response_statuses is not None:
+                    # if response_statuses.status != 'Cancelled':
+                    #     responses.append(response_order)
                     if response_statuses.status != 'Cancelled':
                         responses.append(response_order)
 
@@ -305,7 +309,7 @@ class OrderView(LoginRequiredMixin, MultiModelFormView):
                                                         'offer')
                                                     )
 
-            response.save()
+            # response.save()
 
         return HttpResponseRedirect(self.request.path_info)
 
@@ -331,14 +335,20 @@ class OrderView(LoginRequiredMixin, MultiModelFormView):
                 StatusResponse.objects.create(response_order_id=response_pk,
                                               status='Approved',
                                               user_initiator=self.user)
-                order = get_object_or_404(Order, id=order_pk)
-                order.status = 'Not Active'
-                order.save()
+                # all_responses_for_order = ResponseOrder.objects.filter(order_id=order_pk)
+                # for response_order in all_responses_for_order:
+                #     StatusResponse.objects.create(response_order_id=response_order.id,
+                #                                   status='Not Approved',
+                #                                   user_initiator=self.user)
+                # Делаем изменение статуса заказа на Not Active в модели
+                # order = get_object_or_404(Order, id=order_pk)
+                # order.status = 'Not Active'
+                # order.save()
             except Http404:
                 pass
-            return redirect(reverse_lazy('main'))
+            # return redirect(reverse_lazy('main'))
 
-    # return redirect(reverse_lazy('orders:view_order', kwargs={'pk': order_pk}))
+            return redirect(reverse_lazy('orders:view_order', kwargs={'pk': order_pk}))
 
     def order_rejection(self, response_pk, order_pk):
         """
@@ -348,12 +358,13 @@ class OrderView(LoginRequiredMixin, MultiModelFormView):
         """
         if self.POST:
             # Изменение статусов откликов для Админа
-            if self.user.is_staff or self.user.is_ssuperuser:
+            if self.user.is_staff or self.user.is_superuser:
                 response_order_last = StatusResponse.objects.filter(response_order_id=response_pk).last()
                 if response_order_last.status == 'Cancelled':
                     StatusResponse.objects.create(response_order_id=response_pk,
                                                   status='On Approval',
                                                   user_initiator=self.user)
+                    pass
                 elif response_order_last.status == 'Approved':
                     pass
                 else:
@@ -362,18 +373,19 @@ class OrderView(LoginRequiredMixin, MultiModelFormView):
                                                   user_initiator=self.user)
 
             else:
-                # Отклнение откликов для Заказчика
+                # Отклонение откликов для Заказчика
                 try:
                     # statuse_response = get_object_or_404(
                     #     StatusResponse, id=response_pk)
                     # statuse_response.status = 'Not Approved'
                     # statuse_response.save()
                     StatusResponse.objects.create(response_order_id=response_pk,
-                                                  status='Cancelled',
+                                                  status='Not Approved',
                                                   user_initiator=self.user)
-                    order = get_object_or_404(Order, id=order_pk)
-                    order.status = 'Active'
-                    order.save()
+                    # РАЗОБРАТЬСЯ ИТАК ДОЛЖЕН БЫТЬ ACTIVE
+                    # order = get_object_or_404(Order, id=order_pk)
+                    # order.status = 'Active'
+                    # order.save()
                 except Http404:
                     pass
 
@@ -410,7 +422,7 @@ def table_order(request):
         context['filtered_table'] = OrderFilter(
             request.GET, queryset=Order.objects.filter(status='Active'))
     # ! Здесь устанавливается пагинация
-    paginated = Paginator(context['filtered_table'].qs, 2)
+    paginated = Paginator(context['filtered_table'].qs, 5)
     page_number = request.GET.get('page')
     context['page_obj'] = paginated.get_page(page_number)
 

@@ -55,11 +55,17 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)
         if self.status == 'Not Active':
-            set_responses = StatusResponse.objects.filter(response_order_id=self.id)
+            set_responses = ResponseOrder.objects.filter(order_id=self.id, )
             for response in set_responses:
-                if response.status == 'On Approval':
-                    response.status = 'Not Approved'
-                    response.save()
+                status_response = StatusResponse.objects.filter(response_order_id=response.id).last()
+                if not status_response.status == "Approved":
+                    StatusResponse.objects.create(response_order_id=response.id,
+                                                status='Not Approved',
+                                                user_initiator=self.author)
+
+                # if response.status == 'On Approval':
+                #     response.status = 'Not Approved'
+                #     response.save()
 
     def delete(self, using=None, keep_parents=False):
          if self.status == 'Active':
@@ -88,11 +94,9 @@ class ResponseOrder(models.Model):
 
     def save(self, *args, **kwargs):
         super(ResponseOrder, self).save(*args, **kwargs)
-        obj = StatusResponse.objects.create(response_order=self,
+        StatusResponse.objects.create(response_order=self,
                                             status='On Approval',
                                             user_initiator=self.response_user)
-        obj.save()
-
     
 
 class StatusResponse(models.Model):
@@ -106,7 +110,7 @@ class StatusResponse(models.Model):
 
     response_order = models.ForeignKey(ResponseOrder, on_delete=models.CASCADE, verbose_name='Отклик на заказ')
     status = models.CharField(choices=status_choice,
-                              max_length=120, verbose_name='Статус')
+                              max_length=120, verbose_name='Статус', default='On Approval')
     time_status = models.DateTimeField(auto_now_add=True)
     user_initiator = models.ForeignKey(Profile, on_delete=models.CASCADE, verbose_name='Пользователь инициатор')
 
@@ -123,6 +127,7 @@ class StatusResponse(models.Model):
             obj = Order.objects.get(id=self.response_order.order_id)
             obj.status = 'Not Active'
             obj.save()
+
 
 
 class Feedback(models.Model):

@@ -3,7 +3,7 @@
 <table id="datatable" class="meeting-table table count-digit-table">
     <thead>
     <tr class="count-digit-table">
-        <th class="num">№</th>
+{#        <th class="num">№</th>#}
         <th class="order-id">id Заказа</th>
         <th class="name">Наименование</th>
         <th class="category">Категория</th>
@@ -19,7 +19,7 @@
     <tbody>
     {% for row in page_obj %}
         <tr>
-            <td>{{ forloop.counter }}</td>
+{#            <td>{{ forloop.counter }}</td>#}
             <td data-href="{% url 'orders:view_order' row.id %}"
                 class="meeting-table-row meeting-table-cell">{{ row.id }}</td>
             <td data-href="{% url 'orders:view_order' row.id %}"
@@ -58,12 +58,12 @@
                                 </div>
                                 <div class="modal-body">
                                     Вы действительно уверены, что хотите {% if row.status == 'Active' %}
-                                    Деактивировать{% else %}Активировать{% endif %}?
+                                    Активировать{% else %}Деактивировать{% endif %}?
                                 </div>
                                 <div class="modal-footer">
                                     <div class="row">
                                         <div class="btns">
-                                            <button class="change-status modal-btn {% if row.status == 'Active' %}close-btn{% else %}accept-btn{% endif %}"
+                                            <button class="change-status modal-btn {% if row.status == 'Active' %}accept-btn{% else %}close-btn{% endif %}"
                                                     data-href="{% my_url page_obj.number 'page' request.GET.urlencode row.id %}">
                                                 Подтверждаю
                                             </button>
