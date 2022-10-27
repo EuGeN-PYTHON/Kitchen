@@ -104,11 +104,16 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
         # для Заказчика
         if user.role == 'Customer':
             response_for_customer = ResponseOrder.objects.filter(order__author=user.pk)
-            active_orders = Order.objects.select_related()\
-                .filter(end_time__gte=datetime.today(), author_id=user.pk)\
-                .annotate(count_response=Count('responseorder')) \
-                .values('id', 'category__name', 'author__city', 'name', 'description',
-                        'status', 'create_at', 'end_time', 'count_response')
+            # active_orders = Order.objects.select_related()\
+            #     .filter(end_time__gte=datetime.today(), author_id=user.pk)\
+            #     .annotate(count_response=Count('responseorder')) \
+            #     .values('id', 'category__name', 'author__city', 'name', 'description',
+            #             'status', 'create_at', 'end_time', 'count_response')
+            active_orders = Order.objects.select_related() \
+                    .filter(status='Active', author_id=user.pk) \
+                    .annotate(count_response=Count('responseorder')) \
+                    .values('id', 'category__name', 'author__city', 'name', 'description',
+                            'status', 'create_at', 'end_time', 'count_response')
 
             paginator = Paginator(active_orders, per_page=3)
             try:
@@ -126,7 +131,7 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
         # для поставщика
         elif user.role == 'Supplier':
             active_responses = []
-            responses = ResponseOrder.objects.filter(response_user=user, order__end_time__gte=datetime.today())
+            responses = ResponseOrder.objects.filter(response_user=user, order__end_time__gte=datetime.today(), order__status="Active")
 
             for response in responses:
                 statuses = StatusResponse.objects.filter(

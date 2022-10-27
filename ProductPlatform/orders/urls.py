@@ -20,6 +20,7 @@ from .views import Category, CreateOrder, OrderView, table_order, DeleteCategory
 app_name = 'orders'
 
 urlpatterns = [
+
     path('categories/', categories, name='categories'),
     path('category/<int:id>', Category.as_view(), name='category'),
     path('create_order/', CreateOrder.as_view(), name='create_order'),
@@ -28,15 +29,13 @@ urlpatterns = [
     path('category/delete/<int:pk>/', DeleteCategory.as_view(), name='delete_category'),
     path('order_delete/<int:pk>/', DeleteOrder.as_view(), name='delete_order'),
     path('update/<int:pk>/', UpdateOrder.as_view(), name='update_order'),
-    path('response_delete/<int:pk>/',
-         DeleteResponse.as_view(), name='delete_response'),
+    path('response_delete/<int:pk>/', DeleteResponse.as_view(), name='response_delete'),
     path('response_update/<int:pk>/',
          UpdateResponse.as_view(), name='response_update'),
     path('order_confirmation/<int:response_pk>/<int:order_pk>/', OrderView.order_confirmation,
          name='order_confirmation'),
     path('order_rejection/<int:response_pk>/<int:order_pk>/',
          OrderView.order_rejection, name='order_rejection'),
-    
 
 
 ]

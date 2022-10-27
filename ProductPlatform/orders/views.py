@@ -43,7 +43,8 @@ class MainView(CreateView):
 
         all_suppliers_amount = len(Profile.objects.filter(role='Supplier'))
         all_categories_amount = len(CategoryOrder.objects.all())
-        all_active_orders_amount = len(Order.objects.filter(status='Active'))
+        # all_active_orders_amount = len(Order.objects.filter(status='Active'))
+        all_active_orders_amount = len(Order.objects.all())
         all_customers_amount = len(Profile.objects.filter(role='Customer'))
 
         context['all_suppliers_amount'] = all_suppliers_amount
@@ -576,9 +577,9 @@ class DeleteResponse(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return HttpResponseRedirect(f'{self.get_success_url(page)}')
 
     def test_func(self):
-        order_id = self.kwargs['pk']
-        order = get_object_or_404(Order, id=order_id)
-        user_is_author = order.author == self.request.user
+        response_order_id = self.kwargs['pk']
+        response_order = get_object_or_404(ResponseOrder, id=response_order_id)
+        user_is_author = response_order.response_user == self.request.user
 
         return self.request.user.is_superuser or self.request.user.is_staff or user_is_author
 

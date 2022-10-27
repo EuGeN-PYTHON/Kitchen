@@ -58,7 +58,7 @@ class Order(models.Model):
             set_responses = ResponseOrder.objects.filter(order_id=self.id, )
             for response in set_responses:
                 status_response = StatusResponse.objects.filter(response_order_id=response.id).last()
-                if not status_response.status == "Approved":
+                if status_response.status == "On Approval":
                     StatusResponse.objects.create(response_order_id=response.id,
                                                 status='Not Approved',
                                                 user_initiator=self.author)

@@ -527,7 +527,7 @@
                                             <div class="btns">
                                                 {% if response_id %}
                                                     <form method="POST"
-                                                          action="{% url 'orders:delete_response' response_id %}">
+                                                          action="{% url 'orders:response_delete' response_id %}">
                                                 {% else %}
                                                     <form method="POST" action="">
                                                 {% endif %}
