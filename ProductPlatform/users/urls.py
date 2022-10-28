@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from .views import LoginListView, RegisterListView, Logout, PersonalActiveOrdersView, PersonalHistoryOrdersView, \
     ProfilePasswordResetView, ProfilePasswordResetDoneView, ProfilePasswordResetCompleteView, \
-    ProfilePasswordResetConfirmView
+    ProfilePasswordResetConfirmView, contact_view, success_view
 
 from users.views import PersonalAccountListView, PersonalAccountEditView, ProfileView
 
@@ -37,4 +37,6 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', ProfilePasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', ProfilePasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('profile/<int:id>/', ProfileView.as_view(), name='profile'),
+    path('contact/', contact_view, name='contact'),
+    path('success/', success_view, name='success'),
 ]

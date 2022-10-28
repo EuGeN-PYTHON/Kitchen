@@ -66,3 +66,10 @@ class UserRegisterForm(UserCreationForm):
                 field.widget.attrs['class'] = 'form-control py-2'
             else:
                 field.widget.attrs['class'] = 'form-select py-2'
+
+
+class ContactForm(forms.Form):
+    name_user = forms.CharField(label='Имя', required=True)
+    email = forms.EmailField(label='Email', required=True)
+    issue = forms.CharField(label='Тема', required=True)
+    message = forms.CharField(label='Сообщение', widget=forms.Textarea, required=True)

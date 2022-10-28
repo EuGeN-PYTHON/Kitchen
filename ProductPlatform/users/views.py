@@ -5,15 +5,17 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, 
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, DetailView
 from django.views.generic.edit import FormView
 
+from ProductPlatform.settings import DEFAULT_FROM_EMAIL, RECIPIENTS_EMAIL
 from orders.models import ResponseOrder, Order, StatusResponse
-from users.forms import PersonalAccountEditForm
+from users.forms import PersonalAccountEditForm, ContactForm
 from users.forms import UserLoginForm, UserRegisterForm
 from users.models import Profile
 
@@ -100,7 +102,7 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context = super().get_context_data(**kwargs)
         user = self.request.user
         page = self.request.GET.get('page')
-        
+
         # для Заказчика
         if user.role == 'Customer':
             response_for_customer = ResponseOrder.objects.filter(order__author=user.pk)
@@ -110,10 +112,10 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
             #     .values('id', 'category__name', 'author__city', 'name', 'description',
             #             'status', 'create_at', 'end_time', 'count_response')
             active_orders = Order.objects.select_related() \
-                    .filter(status='Active', author_id=user.pk) \
-                    .annotate(count_response=Count('responseorder')) \
-                    .values('id', 'category__name', 'author__city', 'name', 'description',
-                            'status', 'create_at', 'end_time', 'count_response')
+                .filter(status='Active', author_id=user.pk) \
+                .annotate(count_response=Count('responseorder')) \
+                .values('id', 'category__name', 'author__city', 'name', 'description',
+                        'status', 'create_at', 'end_time', 'count_response')
 
             paginator = Paginator(active_orders, per_page=3)
             try:
@@ -131,18 +133,21 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
         # для поставщика
         elif user.role == 'Supplier':
             active_responses = []
-            responses = ResponseOrder.objects.filter(response_user=user, order__end_time__gte=datetime.today(), order__status="Active")
+            responses = ResponseOrder.objects.filter(response_user=user, order__status="Active")
 
             for response in responses:
-                statuses = StatusResponse.objects.filter(
-                    response_order=response,
-                    status__in=['Not Approved', 'Cancelled'])
-                if len(statuses) == 0:
-                    if StatusResponse.objects.filter(response_order=response, status='Approved').first():
-                        active_responses.append({'response': response, 'status': 'Утверждён'})
-                    else:
-                        active_responses.append({'response': response, 'status': 'На утверждении'})
-            
+                # statuses = StatusResponse.objects.filter(
+                #     response_order=response,
+                #     status__in=['Not Approved', 'Cancelled'])
+                # if len(statuses) == 0:
+                last_status = StatusResponse.objects.filter(response_order=response).last().status
+                if last_status == 'Not Approved':
+                    active_responses.append({'response': response, 'status': 'Отклонен'})
+                elif last_status == 'Cancelled':
+                    active_responses.append({'response': response, 'status': 'Отменен'})
+                else:
+                    active_responses.append({'response': response, 'status': 'На утверждении'})
+
             paginator = Paginator(active_responses, per_page=3)
             try:
                 orders_paginator = paginator.page(page)
@@ -152,7 +157,7 @@ class PersonalActiveOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListView
                 orders_paginator = paginator.page(paginator.num_pages)
             context['paginator'] = orders_paginator.paginator
             context['page_obj'] = orders_paginator
-            
+
             return context
 
     def test_func(self):
@@ -177,6 +182,13 @@ class PersonalHistoryOrdersView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             status_responses = StatusResponse.objects.filter(response_order__order__author=self.request.user.pk,
                                                              response_order__order__status='Not Active')
         elif current_profile.role == 'Supplier':
+            # orders = Order.objects.filter(responseorder__response_user=self.request.user.pk)
+            # responses = orders.responseorder_set.all()
+            # for response_order in responses:
+            #     response_statuses = StatusResponse.objects.filter(
+            #         response_order=response_order).last()
+            #     responses.last_status = response_statuses.status
+
             orders = Order.objects.filter(responseorder__response_user=self.request.user.pk, status='Not Active')
             responses = ResponseOrder.objects.filter(order__id__in=orders.values_list('id'), order__status='Not Active')
             status_responses = StatusResponse.objects.filter(response_order__order__id__in=orders.values_list('id'),
@@ -283,3 +295,30 @@ class ProfileView(LoginRequiredMixin, DetailView):
         except Http404:
             return render(request, self.template_name, {'ERROR': 'Страница не найдена', 'title': '404'})
 
+
+def contact_view(request):
+    # если метод GET, вернем форму
+    if request.method == 'GET':
+        form = ContactForm()
+    elif request.method == 'POST':
+        # если метод POST, проверим форму и отправим письмо
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name_user']
+            subject = form.cleaned_data['issue']
+            from_email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            try:
+                send_mail(f'{subject} от {name};<{from_email}>', message,
+                          DEFAULT_FROM_EMAIL, RECIPIENTS_EMAIL)
+            except BadHeaderError:
+                return HttpResponse('Ошибка в теме письма.')
+            return redirect('users:success')
+    else:
+        return HttpResponse('Неверный запрос.')
+    # return render(request, "email.html", {'form': form})
+    return redirect(reverse_lazy('main'))
+
+
+def success_view(request):
+    return render(request, 'users/sucsesses_request.html')

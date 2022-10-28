@@ -1,0 +1,13 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Reset password request
+From: webmaster@localhost
+To: user6@mail.ru
+Date: Thu, 27 Oct 2022 18:19:38 -0000
+Message-ID: <166689477875.4516.16252509166312677384@1.0.0.127.in-addr.arpa>
+
+Кто-то запросил сброс пароля для электронной почты user6@mail.ru. Перейдите по ссылке ниже::
+http://127.0.0.1:8000/users/reset/Nw/bdytkq-6ace7f3f0564baaa0b0105bab94b55d6/
+Ваше имя пользователя, если вы забыли: user6
+-------------------------------------------------------------------------------

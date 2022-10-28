@@ -129,14 +129,32 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DOMAIN_NAME = 'http:/localhost:8000'
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = 'test'
-EMAIL_HOST_PASSWORD ='test'
-EMAIL_USE_SSL = False
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = 'test'
+# EMAIL_HOST_PASSWORD ='test'
+# EMAIL_USE_SSL = False
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = 'tmp/emails'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = 'estet.estetikov@yandex.ru'
+DEFAULT_FROM_EMAIL = 'My Kitchen <estet.estetikov@yandex.ru>'
+RECIPIENTS_EMAIL = ['estet.estetikov@yandex.ru']
+EMAIL_HOST_PASSWORD = 'kfehyxqnwsigcroo'
+
+
+
+# if DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# else:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+
+
 
 TIME_START_CHECK_ORDER_STATUS = ["12:05", "03:00"]  # запуск скрипта, время по москве
 
