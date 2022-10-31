@@ -9,20 +9,21 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print(BASE_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-16=_c(2y5u^c!1ui)(cv&a@#ywukmvb_dbplne)dmp@qjte4d4'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-16=_c(2y5u^c!1ui)(cv&a@#ywukmvb_dbplne)dmp@qjte4d4')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
 ALLOWED_HOSTS = ['*']
 
@@ -143,7 +144,8 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'estet.estetikov@yandex.ru'
 DEFAULT_FROM_EMAIL = 'My Kitchen <estet.estetikov@yandex.ru>'
 RECIPIENTS_EMAIL = ['estet.estetikov@yandex.ru']
-EMAIL_HOST_PASSWORD = 'kfehyxqnwsigcroo'
+EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_SECRET_KEY')
+
 
 
 
@@ -151,9 +153,6 @@ EMAIL_HOST_PASSWORD = 'kfehyxqnwsigcroo'
 #     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # else:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
-
-
 
 
 TIME_START_CHECK_ORDER_STATUS = ["12:05", "03:00"]  # запуск скрипта, время по москве
