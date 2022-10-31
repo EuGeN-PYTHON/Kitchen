@@ -10,24 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 print(BASE_DIR)
-load_dotenv(BASE_DIR/ '.env')
+load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-16=_c(2y5u^c!1ui)(cv&a@#ywukmvb_dbplne)dmp@qjte4d4')
-
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY',
+                       'django-insecure-16=_c(2y5u^c!1ui)(cv&a@#ywukmvb_dbplne)dmp@qjte4d4')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = os.getenv('DJANGO_DEBUG', True)
-
+DEBUG = os.getenv('DJANGO_DEBUG', 'True')
 
 ALLOWED_HOSTS = ['*']
 
@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'ProductPlatform.urls'
@@ -119,6 +120,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = (BASE_DIR / 'static',)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -150,14 +152,11 @@ DEFAULT_FROM_EMAIL = 'My Kitchen <estet.estetikov@yandex.ru>'
 RECIPIENTS_EMAIL = ['estet.estetikov@yandex.ru']
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
-
-
-
 # if DEBUG:
 #     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # else:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-
 TIME_START_CHECK_ORDER_STATUS = ["12:05", "03:00"]  # запуск скрипта, время по москве
 
+db_from_env = dj_database_url.config()
