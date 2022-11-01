@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'orders',
     'users',
     'django_filters',
-    'corsheaders',
+    # 'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'ProductPlatform.urls'
@@ -171,4 +171,4 @@ TIME_START_CHECK_ORDER_STATUS = ["12:05", "03:00"]  # запуск скрипт�
 
 db_from_env = dj_database_url.config()
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
