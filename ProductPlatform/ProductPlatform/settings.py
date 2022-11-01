@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'orders',
-    'users',
+    'ProductPlatform.orders',
+    'ProductPlatform.users',
     'django_filters',
     # 'corsheaders',
 ]
