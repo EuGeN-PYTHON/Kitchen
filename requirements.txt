@@ -29,6 +29,7 @@ phonenumbers==8.12.49
 Pillow==9.1.1
 platformdirs==2.5.2
 pluggy==1.0.0
+psycopg2-binary==2.9.5
 py==1.11.0
 pycodestyle==2.8.0
 pylint==2.13.9
